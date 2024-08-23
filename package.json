@@ -1,0 +1,17 @@
+{
+  "name": "spectrum-analyzer-test",
+  "version": "1.0.0",
+  "main": "./src/js/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "dsp.js": "^1.0.1",
+    "electron": "^31.3.1",
+    "fft.js": "^4.0.4"
+  }
+}

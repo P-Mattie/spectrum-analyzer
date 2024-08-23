@@ -1,0 +1,54 @@
+
+sample rate = 44100
+bit depth = 16
+chunk size = 4096 bytes
+fft size = 2048
+freq range = 20 - 20k 
+db range = -60dB - 0dB
+
+monitor src: alsa_output.usb-PreSonus_Studio_24c_SC1E20414599-00.analog-stereo.monitor
+
+--------------------------------------------------------------------------------------
+
+
+To Do:
+
+- make sharedArrayBuffer for the fft results. 
+- move fft and window modules back to main ?? 
+- add linear graph option do graph functions
+- make draw plot function with choice of linear / logarithmic
+- make simulate sinewave function with choice of frequency and magnitude
+- test linear graph freq accuracy
+- test logarithmic freq accuracy 
+- test magnitudes
+- perform second fft with lower sample rate and combine the two.
+- normalize magnitudes based on fft size.
+- make compensation filter to adjust magnitudes / dBs
+- 
+
+//-------------------------------
+
+ Audio Source Stream:
+-audio stream is : 16bit, 44100 samples.
+ being buffered with chunk size of 4096
+
+ FFT
+-using requestAnimationFrame to time the fft calls and update canvas.
+- apply a hamming func to the signal
+- create a complex arr, setting the imaginary to 0
+- using fft.js my fftSize is 2048 
+- pass the complex arr size 4096 to fft.transform
+- fft returns complex arr size 4096
+- convert to magnitudes so I get arr size 2048
+- take the first half and convert into db I get arr size of 1024
+- return db values arr
+
+ Graph And Labels
+- range of graph is 20hz - 20khz
+- usign *2.5,*2,*2 repeat I get sections: 20,50,100,200,500,1k,2k,5k,10k,20k
+
+ Draw Function: 
+- take the db values arr
+- divide the graph width by 9 (nr of sections)
+- get the width of 1hz for each section
+- ANDDD HEEEEREEE IS PROBLEEEEM 

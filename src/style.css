@@ -1,0 +1,62 @@
+:root {
+  --main-bg-clr: #131313;
+}
+
+body {
+  background-color: var(--main-bg-clr);
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+canvas {
+  border: 1px solid black;
+  width: auto;
+  height: auto;
+  box-sizing: border-box;
+}
+
+.control {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#startStreamBtn {
+  margin-top: 1em;
+  background-color: #808080;
+  border-radius: 5px;
+  font-weight: 800;
+}
+#startStreamBtn:active {
+  background-color: #a5a5a5;
+}
+
+#spectrumsContainer {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 100px;
+  justify-content: center;
+  margin-top: 1rem;
+  min-height: 600px;
+}
+
+/*----------------------------*/
+
+.canvas-box {
+  display: flex;
+  justify-content: end;
+  align-items: start;
+  margin-top: 3rem;
+}
+
+.graph-container h2 {
+  color: rgb(177, 177, 177);
+  text-align: center;
+  font-weight: 200;
+}
+
+/*----------------------------------------------------------------*/
