@@ -1,15 +1,10 @@
 const {
   DB_MIN,
   DB_MAX,
-  FREQ_MIN,
-  FREQ_MAX,
-  FREQ_LOG_SCALES,
   FREQ_UNITS,
   NUM_FREQ_UNITS,
 } = require("./../utils/global-variables");
 
-const canvasWidth = 700;
-const canvasHeight = 400;
 const graphCanvasScale = 100;
 const graphCanvasMargin = 40;
 const canvasBorderWidth = 1; // from css
@@ -18,44 +13,10 @@ const plotCanvasBgClr = "#0b0b0b";
 const graphCanvasBgClr = "#0f0f0f";
 const canvasTextClr = "#424242";
 
-function makeCanvasElement(usedFFT, canvasWidth, canvasHeight) {
-  const spectrumsContainer = document.getElementById("spectrumsContainer");
-  const graphContainer = document.createElement("div");
-  graphContainer.classList.add("graph-container");
-  const canvasBox = document.createElement("div");
-  canvasBox.classList.add("canvas-box");
-
-  const graphCanvas = document.createElement("canvas");
-  graphCanvas.setAttribute("id", `${usedFFT}GraphCanvas`);
-
-  graphCanvas.width = canvasWidth + graphCanvasScale;
-  graphCanvas.height = canvasHeight + graphCanvasScale;
-  graphCanvas.style.width = `${canvasWidth + graphCanvasScale}px`;
-  graphCanvas.style.height = `${canvasHeight + graphCanvasScale}px`;
-  graphCanvas.style.margin = `-${graphCanvasMargin}px -${graphCanvasMargin}px 0 0 `;
-  graphCanvas.style.position = "absolute";
-
-  const plotCanvas = document.createElement("canvas");
-  plotCanvas.setAttribute("id", `${usedFFT}PlotCanvas`);
-  plotCanvas.width = canvasWidth;
-  plotCanvas.height = canvasHeight;
-  plotCanvas.style.width = `${canvasWidth}px`;
-  plotCanvas.style.height = `${canvasHeight}px`;
-  plotCanvas.style.zIndex = "1";
-
-  const canvasElName = document.createElement("h2");
-  canvasElName.innerHTML = usedFFT;
-
-  canvasBox.appendChild(graphCanvas);
-  canvasBox.appendChild(plotCanvas);
-  graphContainer.appendChild(canvasElName);
-  graphContainer.appendChild(canvasBox);
-  spectrumsContainer.appendChild(graphContainer);
-}
 //-----------------------------------------------------------------------------------
 
-function drawTemplateGraph(usedFFT, canvasWidth, canvasHeight) {
-  canvas = document.getElementById(`${usedFFT}GraphCanvas`);
+function drawGraphLabels(graphId, canvasWidth, canvasHeight) {
+  canvas = document.getElementById(`${graphId}GraphCanvas`);
   ctx = canvas.getContext("2d");
 
   const fontSize = 12;
@@ -112,19 +73,72 @@ function drawTemplateGraph(usedFFT, canvasWidth, canvasHeight) {
     unitXPosition += freqUnitSize;
   }
   unitXPosition = graphCanvasScale - graphCanvasMargin;
+}
+
+//------------------------------------------------------------
+
+function makeGraph(graphId, canvasWidth, canvasHeight) {
+  const spectrumsContainer = document.getElementById("spectrumsContainer");
+  const graphContainer = document.createElement("div");
+  graphContainer.classList.add("graph-container");
+
+  const canvasBox = document.createElement("div");
+  canvasBox.classList.add("canvas-box");
+  canvasBox.setAttribute("id", `${graphId}canvas-box`);
+
+  const graphCanvas = document.createElement("canvas");
+  graphCanvas.setAttribute("id", `${graphId}GraphCanvas`);
+
+  graphCanvas.width = canvasWidth + graphCanvasScale;
+  graphCanvas.height = canvasHeight + graphCanvasScale;
+  graphCanvas.style.width = `${canvasWidth + graphCanvasScale}px`;
+  graphCanvas.style.height = `${canvasHeight + graphCanvasScale}px`;
+  graphCanvas.style.margin = `-${graphCanvasMargin}px -${graphCanvasMargin}px 0 0 `;
+  graphCanvas.style.position = "absolute";
+
+  const canvasElName = document.createElement("h2");
+  canvasElName.innerHTML = graphId;
+
+  canvasBox.appendChild(graphCanvas);
+  graphContainer.appendChild(canvasElName);
+  graphContainer.appendChild(canvasBox);
+  spectrumsContainer.appendChild(graphContainer);
+
+  drawGraphLabels(graphId, canvasWidth, canvasHeight);
+}
+//------------------------------------------------------------
+
+function makeCanvas(graphId, canvasWidth, canvasHeight, analyzerId) {
+  const canvasBox = document.getElementById(`${graphId}canvas-box`);
+
+  const plotCanvas = document.createElement("canvas");
+  plotCanvas.setAttribute("id", `${analyzerId}PlotCanvas`);
+  plotCanvas.width = canvasWidth;
+  plotCanvas.height = canvasHeight;
+  plotCanvas.style.width = `${canvasWidth}px`;
+  plotCanvas.style.height = `${canvasHeight}px`;
+  plotCanvas.style.zIndex = "1";
+  plotCanvas.style.position = "absolute";
+
+  canvasBox.appendChild(plotCanvas);
 
   // add bg color to inner canvas
-  plotCanvas = document.getElementById(`${usedFFT}PlotCanvas`);
   plotCtx = plotCanvas.getContext("2d");
   plotCtx.fillStyle = plotCanvasBgClr;
   plotCtx.fillRect(0, 0, plotCanvas.width, plotCanvas.height);
 }
 
-//------------------------------------------------------------
-function createSpectrum(fftName, canvasWidth, canvasHeight) {
-  makeCanvasElement(fftName, canvasWidth, canvasHeight);
-  drawTemplateGraph(fftName, canvasWidth, canvasHeight);
+function createSpectrum(paramsArray, canvasWidth, canvasHeight) {
+  paramsArray.forEach((params) => {
+    const { graphId, analyzerId, overlapMode } = params;
+
+    if (!overlapMode) {
+      makeGraph(graphId, canvasWidth, canvasHeight);
+      makeCanvas(graphId, canvasWidth, canvasHeight, analyzerId);
+    } else {
+      makeCanvas(graphId, canvasWidth, canvasHeight, analyzerId);
+    }
+  });
 }
 
-createSpectrum("test1", canvasWidth, canvasHeight);
-createSpectrum("test2", canvasWidth, canvasHeight);
+module.exports = createSpectrum;

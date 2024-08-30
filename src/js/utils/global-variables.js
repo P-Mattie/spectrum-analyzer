@@ -6,8 +6,10 @@ const CHUNK_SIZE = FFT_SIZE * 2;
 const FREQ_MIN = 20;
 const FREQ_MAX = 20000;
 const FREQ_LOG_SCALES = [2.5, 2, 2];
-const FREQ_RES = SAMPLE_RATE / (FFT_SIZE / 2);
+const FREQ_RES = SAMPLE_RATE / (FFT_SIZE / 2); // divide by 2 for signal. dont for sine wave test
 // keep multiples of 5
+const MAX_DB_POST_FFT = 78.03677368164062;
+const MIN_DB_POST_FFT = -200;
 const DB_MIN = -60;
 const DB_MAX = 0;
 
@@ -32,6 +34,8 @@ module.exports = {
   FREQ_MIN,
   FREQ_MAX,
   FREQ_LOG_SCALES,
+  MAX_DB_POST_FFT,
+  MIN_DB_POST_FFT,
   DB_MIN,
   DB_MAX,
   FREQ_RES,

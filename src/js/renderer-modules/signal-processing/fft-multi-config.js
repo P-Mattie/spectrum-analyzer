@@ -10,7 +10,8 @@ const { ipcRenderer } = require("electron");
 const { applyWindowFunc, applyWindowOverlap } = require("./helper-funcs");
 const { FFT_SIZE } = require("../../utils/global-variables");
 const drawSpectrum = require("../draw-freq-spectrum");
-const generateSineWav = require("./sine-wave");
+const generateSineWav = require("../signal-processing/sine-wave");
+const bufferMinMaxData = require("../../utils/get-min-max");
 
 //-----------------------------------------------------------
 function performFFT(signal) {
@@ -37,6 +38,8 @@ function performFFT(signal) {
     const magnitude = Math.sqrt(re * re + im * im);
     magnitudes[i] = magnitude / FFT_SIZE;
   }
+  // find min max:
+  // bufferMinMaxData(magnitudes, 3000);
   return magnitudes;
 }
 //-----------------------------------------------------------
@@ -45,6 +48,12 @@ function convertToDB(magnitudes) {
   for (let i = 0; i < magnitudes.length; i++) {
     dbValues[i] = 20 * Math.log10(magnitudes[i] + 1e-10);
   }
+
+  // log the minmax values for dbValues over time in ms
+  // bufferMinMaxData(dbValues, 3000);
+
+  // max: 78.03677368164062 (sinewave at max amp for 16bit)
+  // min: -200              (running the fft in system silence)
 
   return dbValues;
 }
@@ -72,7 +81,8 @@ function runSpectrumAnalysis(paramsArray) {
     ampScale,
     windowType,
     overlap,
-    analyzerId
+    analyzerId,
+    strokeClr
   ) {
     if (!["db", "mag"].includes(ampScale)) {
       throw new Error("invalid ampScale. Use 'db', mag");
@@ -115,7 +125,7 @@ function runSpectrumAnalysis(paramsArray) {
     } else {
       spectrumData = magnitudes;
     }
-    drawSpectrum(spectrumData, analyzerId);
+    drawSpectrum(spectrumData, analyzerId, strokeClr);
 
     if (overlap > 0) {
       state.prevChunk.set(signal.slice(FFT_SIZE - overlapSize));
@@ -129,7 +139,7 @@ function runSpectrumAnalysis(paramsArray) {
       const signal = signalBuffer.shift();
 
       paramsArray.forEach((params) => {
-        const { ampScale, windowType, overlap, analyzerId } = params;
+        const { ampScale, windowType, overlap, analyzerId, strokeClr } = params;
 
         try {
           generateSpectrumData(
@@ -137,7 +147,8 @@ function runSpectrumAnalysis(paramsArray) {
             ampScale,
             windowType,
             overlap,
-            analyzerId
+            analyzerId,
+            strokeClr
           );
         } catch (error) {
           console.error("Error processing parameters:", params, error.message);
@@ -154,6 +165,15 @@ function runSpectrumAnalysis(paramsArray) {
     signalBuffer.push(data);
     update();
   });
+
+  //------------------------------- sine test
+  //   ipcRenderer.on("audioData", (event) => {
+  //     if (signalBuffer.length > 5) {
+  //       signalBuffer.shift();
+  //     }
+  //     signalBuffer.push(generateSineWav());
+  //     update();
+  //   });
 }
 
 module.exports = runSpectrumAnalysis;

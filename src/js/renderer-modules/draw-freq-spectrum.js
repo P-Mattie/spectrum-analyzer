@@ -4,9 +4,11 @@ const {
   FREQ_MAX,
   FREQ_UNITS,
   NUM_FREQ_UNITS,
+  MAX_DB_POST_FFT,
+  MIN_DB_POST_FFT,
 } = require("./../utils/global-variables");
 
-function drawSpectrum(fftData, usedFFT) {
+function drawSpectrum(fftData, usedFFT, strokeClr) {
   const canvas = document.getElementById(`${usedFFT}PlotCanvas`);
   ctx = canvas.getContext("2d");
   numBins = fftData.length / 2;
@@ -35,7 +37,11 @@ function drawSpectrum(fftData, usedFFT) {
           let x =
             (currFreq - FREQ_UNITS[j]) * hzWidthPerUnit[j] +
             j * canvasUnitWidth;
-          let y = canvas.height - (fftData[i] + 300); // to do : scale y to db
+
+          const normalizedDbValue =
+            (fftData[i] - MIN_DB_POST_FFT) /
+            (MAX_DB_POST_FFT - MIN_DB_POST_FFT);
+          let y = canvas.height * (1 - normalizedDbValue);
 
           if (i === 0) {
             ctx.moveTo(x, y);
@@ -48,7 +54,7 @@ function drawSpectrum(fftData, usedFFT) {
       currFreq += FREQ_RES;
     }
   }
-  ctx.strokeStyle = "white";
+  ctx.strokeStyle = strokeClr;
   ctx.lineWidth = 1;
   ctx.stroke();
 }
